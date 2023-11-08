@@ -9,7 +9,7 @@ import (
 )
 
 func VerificationEmailBody(name, url string) (string, error) {
-	tmpl, err := template.ParseFiles("./views/index.html")
+	tmpl, err := template.ParseFiles("./template/verificationEmail.html")
 	if err != nil {
 		return "", echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
