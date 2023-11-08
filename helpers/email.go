@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"carstruck/entity"
+	"carstruck/templates"
 	"carstruck/utils"
 	"fmt"
 	"net/smtp"
@@ -16,19 +17,25 @@ func SendVerificationEmail(user entity.User, verification entity.Verification) e
 	authPass := os.Getenv("AUTH_PASS")
 	smptHost := os.Getenv("SMPT_HOST")
 	smptPort := os.Getenv("SMPT_PORT")
-	verificationUrl := fmt.Sprintf("http://localhost:8080/users/verify/%v/%v", user.ID, verification.Token)
 	
-	body := []byte("To: " + user.Email + "\r\n" +
-		"Subject: Carstruck Account Verification\r\n\r\n" +
-		verificationUrl +"\r\n")
-	
-	smptAuth := smtp.PlainAuth("", authEmail, authPass, smptHost)
-	smptAddr := fmt.Sprintf("%s:%s", smptHost, smptPort)
+	url := fmt.Sprintf("http://localhost:8080/users/verify/%v/%v", user.ID, verification.Token)
+	subject := "Subject: Carstruck Account Verification\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 
-	err := smtp.SendMail(smptAddr, smptAuth, authEmail, []string{user.Email}, body)
+	body, err := templates.VerificationEmailBody(user.FullName, url)
+	if err != nil {
+		return err
+	}
+	
+	smptAddr := fmt.Sprintf("%s:%s", smptHost, smptPort)
+	smptAuth := smtp.PlainAuth("", authEmail, authPass, smptHost)
+	msg := []byte(subject + mime + body)
+
+	err = smtp.SendMail(smptAddr, smptAuth, authEmail, []string{user.Email}, msg)
 	if err != nil {
 		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
+	
 	fmt.Printf("Verification email sent to %v\n", user.Email)
 	return nil
 }
