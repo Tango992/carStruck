@@ -6,6 +6,7 @@ import (
 	"carstruck/helpers"
 	"carstruck/repository"
 	"carstruck/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -76,9 +77,13 @@ func (uc UserController) Login(c echo.Context) error {
 	if err := helpers.CheckPassword(userData, loginData); err != nil {
 		return err
 	}
+
+	if err := helpers.SignNewJWT(c, userData); err != nil {
+		return err
+	}
 	
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: "Logged in",
-		Data: userData,
+		Data: fmt.Sprintf("Welcome, %s!", userData.FullName),
 	})
 }

@@ -19,7 +19,7 @@ func CreateHash(data *dto.Register) error {
 	return nil
 }
 
-// Returns true if password does not match with the original hash
+// Returns error if password does not match with the original hash
 func CheckPassword(dbData entity.User, data dto.Login) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(dbData.Password), []byte(data.Password)); err != nil {
 		return echo.NewHTTPError(utils.ErrUnauthorized.Details("Invalid email / password"))
