@@ -1,6 +1,6 @@
 package entity
 
-type Category struct {
+type Brand struct {
 	ID       uint   `gorm:"primaryKey"`
 	Name     string `gorm:"not null"`
 	Catalogs []Catalog

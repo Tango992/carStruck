@@ -21,12 +21,9 @@ func main() {
 	userController := controller.NewUserController(dbHandler)
 
 	e := echo.New()
-	e.Validator = &helpers.CustomValidator{NewValidator: validator.New()}
-
 	e.Pre(middleware.RemoveTrailingSlash())
-	
+	e.Validator = &helpers.CustomValidator{NewValidator: validator.New()}
 	logger := zerolog.New(os.Stdout)
-
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogURI:    true,
 		LogStatus: true,
@@ -46,10 +43,18 @@ func main() {
 	users := e.Group("/users")
 	{
 		users.POST("/register", userController.Register)
-		users.POST("/login", userController.Login)
-		users.POST("/topup", userController.TopUp, middlewares.RequireAuth)
 		users.GET("/verify/:userid/:token", userController.VerifyEmail)
+		users.POST("/login", userController.Login)
+
+		usersRequireAuth := users.Group("")
+		usersRequireAuth.Use(middlewares.RequireAuth)
+		{
+			usersRequireAuth.POST("/pinpoint", userController.PinpointLocation)
+			usersRequireAuth.POST("/topup", userController.TopUp)
+		}
 	}
 
+
+	
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

@@ -47,6 +47,7 @@ func (uc UserController) Register(c echo.Context) error {
 		Password: registerDataTmp.Password,
 		Birth: registerDataTmp.Birth,
 		Deposit: registerDataTmp.Deposit,
+		Address: registerDataTmp.Address,
 	}
 	
 	if err := uc.DbHandler.CreateUser(&registerData); err != nil {
@@ -68,7 +69,7 @@ func (uc UserController) Register(c echo.Context) error {
 	
 	registerDataTmp.Password = ""
 	return c.JSON(http.StatusCreated, dto.Response{
-		Message: "Registered",
+		Message: "Registered. Please check your email to do a verification",
 		Data: registerDataTmp,
 	})
 }
@@ -139,4 +140,13 @@ func (uc UserController) VerifyEmail(c echo.Context) error {
 		Message: "Validated",
 		Data: "Your email has been validated",
 	})
+}
+
+func (uc UserController) PinpointLocation(c echo.Context) error {
+	_, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+	
+	return nil
 }
