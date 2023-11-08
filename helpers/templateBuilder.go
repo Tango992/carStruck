@@ -1,4 +1,4 @@
-package templates
+package helpers
 
 import (
 	"bytes"
@@ -14,12 +14,9 @@ func VerificationEmailBody(name, url string) (string, error) {
 		return "", echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 	
-	templateData := struct {
-		Name string
-		URL  string
-	}{
-		Name: name,
-		URL:  url,
+	templateData := map[string]string{
+		"Name": name,
+		"URL": url,
 	}
 	
 	buf := new(bytes.Buffer)

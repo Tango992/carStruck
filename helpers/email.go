@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"carstruck/entity"
-	"carstruck/templates"
 	"carstruck/utils"
 	"fmt"
 	"net/smtp"
@@ -22,7 +21,7 @@ func SendVerificationEmail(user entity.User, verification entity.Verification) e
 	subject := "Subject: Carstruck Account Verification\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 
-	body, err := templates.VerificationEmailBody(user.FullName, url)
+	body, err := VerificationEmailBody(user.FullName, url)
 	if err != nil {
 		return err
 	}
