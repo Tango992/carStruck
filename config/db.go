@@ -1,6 +1,7 @@
 package config
 
 import (
+	"carstruck/entity"
 	"log"
 	"os"
 
@@ -14,5 +15,12 @@ func InitDb() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+	AutoMigrate(db)
 	return db
+}
+
+func AutoMigrate(db *gorm.DB) {
+	if err := db.AutoMigrate(&entity.User{}, &entity.Validation{}, &entity.Category{}, &entity.Catalog{}, &entity.History{}); err != nil {
+		log.Fatal(err)
+	}
 }
