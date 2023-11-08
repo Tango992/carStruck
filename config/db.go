@@ -20,7 +20,7 @@ func InitDb() *gorm.DB {
 }
 
 func AutoMigrate(db *gorm.DB) {
-	if err := db.AutoMigrate(&entity.User{}, &entity.Validation{}, &entity.Category{}, &entity.Catalog{}, &entity.History{}); err != nil {
+	if err := db.AutoMigrate(&entity.User{}, &entity.Verification{}, &entity.Category{}, &entity.Catalog{}, &entity.Order{}); err != nil {
 		log.Fatal(err)
 	}
 }

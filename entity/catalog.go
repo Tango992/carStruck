@@ -6,5 +6,5 @@ type Catalog struct {
 	Stock      uint    `gorm:"not null;default:0"`
 	Cost       float32 `gorm:"not null"`
 	CategoryID uint    `gorm:"not null"`
-	Histories  []History
+	Orders  []Order
 }

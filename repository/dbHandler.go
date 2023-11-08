@@ -39,3 +39,40 @@ func (db DbHandler) FindUser(loginData dto.Login) (entity.User, error) {
 	}
 	return user, nil
 }
+
+func (db DbHandler) AddToken(data *entity.Verification) error {
+	if err := db.Create(data).Error; err != nil {
+		return echo.NewHTTPError(utils.ErrConflict.Details(err.Error()))
+	}
+	return nil
+}
+
+func (db DbHandler) ValidateEmail(data *entity.Verification) error {
+	txErr := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("token = ?", data.Token).First(data).Error; err != nil {
+			return echo.NewHTTPError(utils.ErrBadRequest.Details(err.Error()))
+		}
+
+		if err := tx.Model(data).Update("validated", true).Error; err != nil {
+			return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+		}
+		
+		return nil
+	})
+	if txErr != nil {
+		return txErr
+	}
+	return nil
+}
+
+func (db DbHandler) CheckVerification(user entity.User) error {
+	var validated bool
+	if err := db.Table("verifications v").Select("v.validated").Where("u.id = ?", user.ID).Joins("JOIN users u ON v.user_id = u.id").Take(&validated).Error; err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+
+	if !validated {
+		return echo.NewHTTPError(utils.ErrForbidden.Details("Please do an email verification first"))
+	}
+	return nil
+}

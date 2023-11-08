@@ -8,6 +8,7 @@ import (
 	"carstruck/utils"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -47,8 +48,21 @@ func (uc UserController) Register(c echo.Context) error {
 		Birth: registerDataTmp.Birth,
 		Deposit: registerDataTmp.Deposit,
 	}
-
+	
 	if err := uc.DbHandler.CreateUser(&registerData); err != nil {
+		return err
+	}
+
+	verification := entity.Verification{
+		UserID: registerData.ID,
+		Token: helpers.GenerateVerificationToken(),
+	}
+
+	if err := uc.DbHandler.AddToken(&verification); err != nil {
+		return err
+	}
+
+	if err := helpers.SendVerificationEmail(registerData, verification); err != nil {
 		return err
 	}
 	
@@ -78,6 +92,10 @@ func (uc UserController) Login(c echo.Context) error {
 		return err
 	}
 
+	if err := uc.DbHandler.CheckVerification(userData); err != nil {
+		return err
+	}
+	
 	if err := helpers.SignNewJWT(c, userData); err != nil {
 		return err
 	}
@@ -97,5 +115,28 @@ func (uc UserController) TopUp(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: "Top up",
 		Data: user,
+	})
+}
+
+func (uc UserController) VerifyEmail(c echo.Context) error {
+	token := c.Param("token")
+	userIdTmp := c.Param("userid")
+	userId, err := strconv.Atoi(userIdTmp)
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.Details("Invalid verification URL"))
+	}
+
+	verificationData := entity.Verification{
+		UserID: uint(userId),
+		Token: token,
+	}
+	
+	if err := uc.DbHandler.ValidateEmail(&verificationData); err != nil {
+		return err
+	}
+	
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Validated",
+		Data: "Your email has been validated",
 	})
 }

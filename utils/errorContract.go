@@ -19,6 +19,11 @@ var (
 		Type:   "Unauthorized",
 	}
 
+	ErrForbidden = ErrResponse{
+		Status: http.StatusForbidden,
+		Type:   "Forbidden",
+	}
+
 	ErrNotFound = ErrResponse{
 		Status: http.StatusNotFound,
 		Type:   "Not Found",
