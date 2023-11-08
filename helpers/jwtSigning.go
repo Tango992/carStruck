@@ -11,8 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Create a new JWT and sign it
-func SignNewJWT(c echo.Context,user entity.User) error {
+// Create a new JWT, sign it, and set to a cookie
+func SignNewJWT(c echo.Context, user entity.User) error {
 	claims := jwt.MapClaims{
 		"exp": time.Now().Add(2 * time.Hour).Unix(),
 		"id": user.ID,

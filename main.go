@@ -4,6 +4,7 @@ import (
 	"carstruck/config"
 	"carstruck/controller"
 	"carstruck/helpers"
+	"carstruck/middlewares"
 	"carstruck/repository"
 
 	"github.com/go-playground/validator/v10"
@@ -28,6 +29,7 @@ func main() {
 	{
 		users.POST("/register", userController.Register)
 		users.POST("/login", userController.Login)
+		users.POST("/topup", userController.TopUp, middlewares.RequireAuth)
 	}
 
 	e.Logger.Fatal(e.Start(":8080"))

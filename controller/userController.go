@@ -87,3 +87,15 @@ func (uc UserController) Login(c echo.Context) error {
 		Data: fmt.Sprintf("Welcome, %s!", userData.FullName),
 	})
 }
+
+func (uc UserController) TopUp(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Top up",
+		Data: user,
+	})
+}
