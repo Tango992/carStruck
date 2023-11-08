@@ -19,6 +19,7 @@ func main() {
 	db := config.InitDb()
 	dbHandler := repository.NewDBHandler(db)
 	userController := controller.NewUserController(dbHandler)
+	orderController := controller.NewOrderController(dbHandler)
 
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -45,16 +46,14 @@ func main() {
 		users.POST("/register", userController.Register)
 		users.GET("/verify/:userid/:token", userController.VerifyEmail)
 		users.POST("/login", userController.Login)
-
-		usersRequireAuth := users.Group("")
-		usersRequireAuth.Use(middlewares.RequireAuth)
-		{
-			usersRequireAuth.POST("/pinpoint", userController.PinpointLocation)
-			usersRequireAuth.POST("/topup", userController.TopUp)
-		}
+		users.POST("/pinpoint", userController.PinpointLocation, middlewares.RequireAuth)
 	}
 
-
+	orders := e.Group("/orders")
+	orders.Use(middlewares.RequireAuth)
+	{
+		orders.POST("", orderController.NewOrder)
+	}
 	
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

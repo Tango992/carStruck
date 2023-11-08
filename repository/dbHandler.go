@@ -76,3 +76,10 @@ func (db DbHandler) CheckVerification(user entity.User) error {
 	}
 	return nil
 }
+
+func (db DbHandler) CreateOrder(data *entity.Order) error {
+	if err := db.Create(data).Error; err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return nil
+}

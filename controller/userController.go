@@ -107,18 +107,6 @@ func (uc UserController) Login(c echo.Context) error {
 	})
 }
 
-func (uc UserController) TopUp(c echo.Context) error {
-	user, err := helpers.GetClaims(c)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, dto.Response{
-		Message: "Top up",
-		Data: user,
-	})
-}
-
 func (uc UserController) VerifyEmail(c echo.Context) error {
 	token := c.Param("token")
 	userIdTmp := c.Param("userid")
@@ -147,6 +135,5 @@ func (uc UserController) PinpointLocation(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	
 	return nil
 }
