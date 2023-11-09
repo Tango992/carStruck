@@ -25,7 +25,7 @@ func SendVerificationEmail(user entity.User, verification entity.Verification) e
 	if err != nil {
 		return err
 	}
-	
+
 	smptAddr := fmt.Sprintf("%s:%s", smptHost, smptPort)
 	smptAuth := smtp.PlainAuth("", authEmail, authPass, smptHost)
 	msg := []byte(subject + mime + body)

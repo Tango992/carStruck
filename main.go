@@ -20,6 +20,7 @@ func main() {
 	dbHandler := repository.NewDBHandler(db)
 	userController := controller.NewUserController(dbHandler)
 	orderController := controller.NewOrderController(dbHandler)
+	catalogController := controller.NewCatalogController(dbHandler)
 
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -54,6 +55,8 @@ func main() {
 	{
 		orders.POST("", orderController.NewOrder)
 	}
+
+	e.GET("/catalogs", catalogController.ViewCatalogHandler)
 	
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

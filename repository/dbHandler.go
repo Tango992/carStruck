@@ -78,8 +78,6 @@ func (db DbHandler) CheckVerification(user entity.User) error {
 }
 
 func (db DbHandler) CreateOrder(data *entity.Order) error {
-	
-	
 	txErr := db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(data).Error; err != nil {
 			return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
@@ -93,4 +91,60 @@ func (db DbHandler) CreateOrder(data *entity.Order) error {
 		return txErr
 	}
 	return nil
+}
+
+func (db DbHandler) FindAllCatalogs() ([]dto.Catalog, error) {
+	catalogs := []dto.Catalog{}
+
+	if err := db.Table("catalogs c").Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Scan(&catalogs).Error; err != nil {
+		return []dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return catalogs, nil
+}
+
+func (db DbHandler) FindCatalogByBrand(brand string)  ([]dto.Catalog, error) {
+	catalogs := []dto.Catalog{}
+
+	res := db.Table("catalogs c").Where("b.name = ?", brand).Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Scan(&catalogs)
+	err := res.Error
+
+	if err != nil {
+		return []dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+
+	if res.RowsAffected == 0 {
+		return []dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Brand does not exist in our catalog"))
+	}
+	
+	return catalogs, nil
+}
+
+func (db DbHandler) FindCatalogByModel(model string)  (dto.Catalog, error) {
+	catalog := dto.Catalog{}
+
+	res := db.Table("catalogs c").Where("c.name = ?", model).Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Take(&catalog)
+	err := res.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound){
+			return dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Model does not exist in our catalog"))
+		}
+		return dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return catalog, nil
+}
+
+func (db DbHandler) FindCatalogByBrandAndModel(brand, model string)  (dto.Catalog, error) {
+	catalog := dto.Catalog{}
+
+	res := db.Table("catalogs c").Where("c.name = ?", model).Where("b.name = ?", brand).Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Take(&catalog)
+	err := res.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound){
+			return dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Model does not exist in our catalog"))
+		}
+		return dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return catalog, nil
 }
