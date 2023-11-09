@@ -53,7 +53,7 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 	if currentDate > rentDateFormatted.Unix() {
 		return echo.NewHTTPError(utils.ErrBadRequest.Details("Rent date cannot be less than today"))
 	}
-	returnDate := time.Now().AddDate(0, 0, int(orderDataTmp.Duration)).Format(dateFormat)
+	returnDate := rentDateFormatted.AddDate(0, 0, int(orderDataTmp.Duration)).Format(dateFormat)
 
 	orderData := entity.Order{
 		UserID:     user.ID,
