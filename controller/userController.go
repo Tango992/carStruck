@@ -25,6 +25,17 @@ func NewUserController(dbHandler repository.DbHandler) UserController {
 	}
 }
 
+// Register      godoc
+// @Summary      Register new user into database
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.Register  true  "Register data"
+// @Success      201  {object}  dto.RegisterResponse
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      409  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /users/register [post]
 func (uc UserController) Register(c echo.Context) error {
 	var registerDataTmp dto.Register
 	if err := c.Bind(&registerDataTmp); err != nil {
@@ -75,6 +86,18 @@ func (uc UserController) Register(c echo.Context) error {
 	})
 }
 
+// Login         godoc
+// @Summary      Log in with existing account
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.Login  true  "Login data"
+// @Success      200  {object}  dto.GeneralResponse
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
+// @Failure      403  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /users/login [post]
 func (uc UserController) Login(c echo.Context) error {
 	var loginData dto.Login
 	if err := c.Bind(&loginData); err != nil {
@@ -108,6 +131,17 @@ func (uc UserController) Login(c echo.Context) error {
 	})
 }
 
+// Verification  godoc
+// @Summary      Verify newly registered email
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "User Id"
+// @Param        token   path      int  true  "Secret Token"
+// @Success      200  {object}  dto.GeneralResponse
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /users/verify/{userid}/{token} [get]
 func (uc UserController) VerifyEmail(c echo.Context) error {
 	token := c.Param("token")
 	userIdTmp := c.Param("userid")
@@ -130,6 +164,17 @@ func (uc UserController) VerifyEmail(c echo.Context) error {
 		Data: "Your email has been validated",
 	})
 }
+
+// Get Histories  godoc
+// @Summary      Get user's order history
+// @Description  You need an 'Authorization' cookie attached within this request.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  dto.HistoryResponse
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /users/history [get]
 func (uc UserController) History(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {
@@ -147,6 +192,15 @@ func (uc UserController) History(c echo.Context) error {
 	})
 }
 
+// Get User's location     godoc
+// @Summary      Get user's map location
+// @Description  You need an 'Authorization' cookie attached within this request.
+// @Tags         users
+// @Accept       json
+// @Produce      image/png
+// @Success      200  
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /users/pinpoint [get]
 func (uc UserController) PinpointLocation(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {

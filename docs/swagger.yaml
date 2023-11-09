@@ -1,0 +1,295 @@
+basePath: /
+definitions:
+  dto.CatalogLessDetail:
+    properties:
+      catalog_id:
+        type: integer
+      model:
+        type: string
+    type: object
+  dto.GeneralResponse:
+    properties:
+      data:
+        type: string
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.HistoryResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.OrderSummary'
+        type: array
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.Login:
+    properties:
+      email:
+        type: string
+        x-order: "0"
+      password:
+        type: string
+        x-order: "1"
+    required:
+    - email
+    - password
+    type: object
+  dto.OrderSummary:
+    properties:
+      catalog:
+        allOf:
+        - $ref: '#/definitions/dto.CatalogLessDetail'
+        x-order: "1"
+      invoice:
+        allOf:
+        - $ref: '#/definitions/dto.SendInvoiceResponseLessDetailed'
+        x-order: "4"
+      order_id:
+        type: integer
+        x-order: "0"
+      rent_date:
+        type: string
+        x-order: "2"
+      return_date:
+        type: string
+        x-order: "3"
+    type: object
+  dto.Register:
+    properties:
+      address:
+        type: string
+        x-order: "3"
+      birth:
+        type: string
+        x-order: "4"
+      email:
+        type: string
+        x-order: "1"
+      full_name:
+        type: string
+        x-order: "0"
+      password:
+        type: string
+        x-order: "2"
+    required:
+    - address
+    - birth
+    - email
+    - full_name
+    - password
+    type: object
+  dto.RegisterData:
+    properties:
+      address:
+        type: string
+        x-order: "2"
+      birth:
+        type: string
+        x-order: "3"
+      email:
+        type: string
+        x-order: "1"
+      full_name:
+        type: string
+        x-order: "0"
+    required:
+    - address
+    - birth
+    - email
+    - full_name
+    type: object
+  dto.RegisterResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/dto.RegisterData'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
+    type: object
+  dto.SendInvoiceResponseLessDetailed:
+    properties:
+      amount:
+        type: number
+      id:
+        type: string
+      invoice_url:
+        type: string
+      status:
+        type: string
+    type: object
+  utils.ErrResponse:
+    properties:
+      detail:
+        type: string
+        x-order: "2"
+      status:
+        type: integer
+        x-order: "0"
+      type:
+        type: string
+        x-order: "1"
+    type: object
+host: https://carstruck-4d6b89ee5e4e.herokuapp.com
+info:
+  contact:
+    email: daniel.rahmanto@gmail.com
+    name: Daniel Rahmanto
+  description: A car rental API utilizing payment gateway (Xendit) and Google Maps
+    API. Made as a project for Hacktiv8
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: carStruck API
+  version: "1.0"
+paths:
+  /users/history:
+    get:
+      consumes:
+      - application/json
+      description: You need an 'Authorization' cookie attached within this request.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HistoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get user's order history
+      tags:
+      - users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Log in with existing account
+      tags:
+      - users
+  /users/pinpoint:
+    get:
+      consumes:
+      - application/json
+      description: You need an 'Authorization' cookie attached within this request.
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get user's map location
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Register'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Register new user into database
+      tags:
+      - users
+  /users/verify/{userid}/{token}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Secret Token
+        in: path
+        name: token
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Verify newly registered email
+      tags:
+      - users
+swagger: "2.0"

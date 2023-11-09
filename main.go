@@ -6,8 +6,10 @@ import (
 	"carstruck/helpers"
 	"carstruck/middlewares"
 	"carstruck/repository"
+	_ "carstruck/docs"
 	"os"
 
+	"github.com/swaggo/echo-swagger"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
@@ -15,6 +17,18 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// @title carStruck API
+// @version 1.0
+// @description A car rental API utilizing payment gateway (Xendit) and Google Maps API. Made as a project for Hacktiv8
+
+// @contact.name Daniel Rahmanto
+// @contact.email daniel.rahmanto@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host https://carstruck-4d6b89ee5e4e.herokuapp.com
+// @BasePath /
 func main() {
 	db := config.InitDb()
 	dbHandler := repository.NewDBHandler(db)
@@ -57,6 +71,7 @@ func main() {
 		orders.POST("/update", orderController.FetchPaymentUpdate)
 	}
 	e.GET("/catalogs", catalogController.ViewCatalogHandler)
-	
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

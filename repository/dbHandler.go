@@ -214,7 +214,7 @@ func (db DbHandler) FindUserOrderHistory(userId uint) ([]dto.OrderSummary, error
 }
 
 func (db DbHandler) UpdatePaymentStatus(data dto.XenditWebhook) (error) {
-	now := time.Now().Local().Format("2006-01-02 15:04:05")
+	now := time.Now().Format("2006-01-02 15:04:05")
 	orderId, _ := strconv.Atoi(data.ExternalId)
 	payment := entity.Payment{OrderID: uint(orderId)}
 
