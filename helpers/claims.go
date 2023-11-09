@@ -17,9 +17,10 @@ func GetClaims(c echo.Context) (dto.Claims, error) {
 
 	claims := claimsTmp.(jwt.MapClaims)
 	return dto.Claims{
-		ID: uint(claims["id"].(float64)),
-		Email: claims["email"].(string),
+		ID:       uint(claims["id"].(float64)),
+		Email:    claims["email"].(string),
 		FullName: claims["full_name"].(string),
-		Deposit: float32(claims["deposit"].(float64)),
+		Deposit:  float32(claims["deposit"].(float64)),
+		Address:  claims["address"].(string),
 	}, nil
 }

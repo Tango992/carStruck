@@ -7,7 +7,9 @@ import (
 	"carstruck/repository"
 	"carstruck/utils"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -131,9 +133,31 @@ func (uc UserController) VerifyEmail(c echo.Context) error {
 }
 
 func (uc UserController) PinpointLocation(c echo.Context) error {
-	_, err := helpers.GetClaims(c)
+	user, err := helpers.GetClaims(c)
 	if err != nil {
 		return err
 	}
-	return nil
+
+	baseUrl := "https://maps.googleapis.com/maps/api/staticmap"
+	req, _ := http.NewRequest(http.MethodGet, baseUrl, nil)
+
+	q := req.URL.Query()
+	q.Add("center", user.Address)
+	q.Add("key", os.Getenv("MAPS_API_KEY"))
+	q.Add("markers", "|" + user.Address)
+	q.Add("size", "640x640")
+	q.Add("zoom", "16")
+	req.URL.RawQuery = q.Encode()
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	defer res.Body.Close()
+	
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return c.Blob(http.StatusOK, "image/png", body)
 }

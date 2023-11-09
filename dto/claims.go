@@ -5,4 +5,5 @@ type Claims struct {
 	Email    string  `json:"email"`
 	FullName string  `json:"full_name"`
 	Deposit  float32 `json:"deposit"`
+	Address  string  `json:"address"`
 }

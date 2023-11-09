@@ -19,6 +19,7 @@ func SignNewJWT(c echo.Context, user entity.User) error {
 		"email": user.Email,
 		"deposit": user.Deposit,
 		"full_name": user.FullName,
+		"address": user.Address,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
