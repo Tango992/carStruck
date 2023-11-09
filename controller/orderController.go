@@ -114,3 +114,16 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 		Data:    orderResponse,
 	})
 }
+
+func (oc OrderController) FetchPaymentUpdate(c echo.Context) error {
+	var paymentData dto.XenditWebhook
+	if err := c.Bind(&paymentData); err != nil {
+		return echo.NewHTTPError(utils.ErrBadRequest.Details(err.Error()))
+	}
+
+	if err := oc.DbHandler.UpdatePaymentStatus(paymentData); err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}

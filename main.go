@@ -52,11 +52,10 @@ func main() {
 	}
 
 	orders := e.Group("/orders")
-	orders.Use(middlewares.RequireAuth)
 	{
-		orders.POST("", orderController.NewOrder)
+		orders.POST("", orderController.NewOrder, middlewares.RequireAuth)
+		orders.POST("/update", orderController.FetchPaymentUpdate)
 	}
-
 	e.GET("/catalogs", catalogController.ViewCatalogHandler)
 	
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))

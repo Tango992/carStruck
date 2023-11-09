@@ -26,3 +26,11 @@ type SendInvoiceResponseLessDetailed struct {
 	InvoiceURL string  `json:"invoice_url"`
 	Status     string  `json:"status,omitempty"`
 }
+
+type XenditWebhook struct {
+	ExternalId    string `json:"external_id"`
+	InvoiceId     string `json:"id"`
+	Status        string `json:"status"`
+	PaymentMethod string `json:"payment_method"`
+	CompletedAt   string `json:"completed_at"`
+}

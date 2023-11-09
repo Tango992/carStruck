@@ -5,6 +5,7 @@ import (
 	"carstruck/entity"
 	"carstruck/utils"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -210,4 +211,21 @@ func (db DbHandler) FindUserOrderHistory(userId uint) ([]dto.OrderSummary, error
 		return []dto.OrderSummary{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 	return orders, nil
+}
+
+func (db DbHandler) UpdatePaymentStatus(data dto.XenditWebhook) (error) {
+	now := time.Now().Local().Format("2006-01-02 15:04:05")
+	orderId, _ := strconv.Atoi(data.ExternalId)
+	payment := entity.Payment{OrderID: uint(orderId)}
+
+	if err := db.Model(&payment).
+		Updates(&entity.Payment{
+			Status: data.Status,
+			PaymentMethod: data.PaymentMethod,
+			CompletedAt: now,
+		}).
+	Error; err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return nil
 }
