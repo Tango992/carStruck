@@ -5,6 +5,7 @@ import (
 	"carstruck/entity"
 	"carstruck/utils"
 	"errors"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -77,12 +78,12 @@ func (db DbHandler) CheckVerification(user entity.User) error {
 	return nil
 }
 
-func (db DbHandler) CreateOrder(data *entity.Order, duration uint) (float32, error){
+func (db DbHandler) CreateOrder(data *entity.Order, duration uint) (float32, entity.Catalog, error){
 	catalog := entity.Catalog{ID: data.CatalogID}
 	
 	txErr := db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.First(&catalog).Error; err != nil {
-			return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+			return echo.NewHTTPError(utils.ErrNotFound.Details("Catalog ID does not exist"))
 		}
 		
 		if err := tx.Model(&catalog).Update("stock", gorm.Expr("stock - 1")).Error; err != nil {
@@ -95,24 +96,22 @@ func (db DbHandler) CreateOrder(data *entity.Order, duration uint) (float32, err
 		return nil
 	})
 	if txErr != nil {
-		return 0, txErr
+		return 0, entity.Catalog{}, txErr
 	}
 
 	subtotal := catalog.Cost * float32(duration)
-	return subtotal, nil
+	return subtotal, catalog, nil
 }
 
-// func (db DbHandler) CreatePayment(orderId uint) error {
-// 	payment := entity.Payment{OrderID: orderId}
+func (db DbHandler) CreatePayment(data *entity.Payment) error {
+	now := time.Now().Format("2006-01-02 15:04:05")
+	data.CreatedAt = now
 	
-// 	txErr := db.Transaction(func(tx *gorm.DB) error {
-// 		return nil
-// 	})
-// 	if txErr != nil {
-// 		return txErr
-// 	}
-// 	return nil
-// }
+	if err := db.Create(data).Error; err != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return nil
+}
 
 func (db DbHandler) FindAllCatalogs() ([]dto.Catalog, error) {
 	catalogs := []dto.Catalog{}

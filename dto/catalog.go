@@ -8,3 +8,8 @@ type Catalog struct {
 	Stock     uint    `json:"stock"`
 	Cost      float32 `json:"cost"`
 }
+
+type CatalogLessDetail struct {
+	CatalogID uint    `json:"catalog_id"`
+	Model     string  `json:"model"`
+}

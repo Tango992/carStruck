@@ -1,26 +1,23 @@
 package controller
 
 import (
-	// "bytes"
-	"bytes"
 	"carstruck/dto"
 	"carstruck/entity"
 	"carstruck/helpers"
 	"carstruck/repository"
 	"carstruck/utils"
+	"net/http"
 
-	// "context"
-	"encoding/json"
+	"context"
+	// "encoding/json"
 	"fmt"
 
-	// "fmt"
-	"net/http"
 	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	// xendit "github.com/xendit/xendit-go/v3"
-	// invoice "github.com/xendit/xendit-go/v3/invoice"
+	xendit "github.com/xendit/xendit-go/v3"
+	invoice "github.com/xendit/xendit-go/v3/invoice"
 )
 
 type OrderController struct {
@@ -68,66 +65,53 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 		ReturnDate: returnDate,
 	}
 
-	subtotal, err := oc.DbHandler.CreateOrder(&orderData, orderDataTmp.Duration)
+	subtotal, catalog, err := oc.DbHandler.CreateOrder(&orderData, orderDataTmp.Duration)
 	if err != nil {
 		return err
 	}
 	
-	sendInvoice := dto.SendInvoice{
-		ExternalID: fmt.Sprintf("%v", orderData.ID),
-		Amount: subtotal,
-		Description: user.FullName + "'s order",
-		CustomerDetail: dto.CustomerDetail{
-			GivenNames: user.FullName,
-			Email: user.Email,
-		},
-	}
-	jsonBody, err := json.Marshal(sendInvoice)
-	if err != nil {
-		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
-	}
-	bodyReader := bytes.NewReader(jsonBody)
-	
-	url := "https://api.xendit.co/v2/invoices"
-	base64ApiKey := helpers.BasicAuth64(os.Getenv("XENDIT_API_KEY"), "")
-	
-	req, _ := http.NewRequest("POST", url, bodyReader)
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", base64ApiKey)
+	createInvoiceRequest := *invoice.NewCreateInvoiceRequest(fmt.Sprintf("%v", orderData.ID), subtotal)
+    xenditClient := xendit.NewClient(os.Getenv("XENDIT_API_KEY"))
 
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
-	}
-	defer res.Body.Close()
-
-	var xenditResponse dto.SendInvoiceResponse
-	if err := json.NewDecoder(res.Body).Decode(&xenditResponse); err != nil {
-		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+    resp, _, errXnd := xenditClient.InvoiceApi.CreateInvoice(context.Background()).
+        CreateInvoiceRequest(createInvoiceRequest).
+        Execute()
+	if errXnd != nil {
+		return echo.NewHTTPError(utils.ErrInternalServer.Details(errXnd.Error()))
 	}
 	
-	// if err := oc.DbHandler.CreatePayment(orderData.ID); err != nil {
-	// 	return err
-	// }
+	paymentData := entity.Payment{
+		OrderID: orderData.ID,
+		InvoiceID: *resp.Id,
+		Amount: resp.Amount,
+		InvoiceURL: resp.InvoiceUrl,
+		Status: resp.Status.String(),
+	}
+	
+	if err := oc.DbHandler.CreatePayment(&paymentData); err != nil {
+		return err
+	}
+	
+	orderedCatalog := dto.CatalogLessDetail{
+		CatalogID: catalog.ID,
+		Model: catalog.Name,
+	}
 
-	// createInvoiceRequest := *invoice.NewCreateInvoiceRequest("test", subtotal) // [REQUIRED] | CreateInvoiceRequest
-    // xenditClient := xendit.NewClient("XENDIT_API_KEY"+":")
-
-    // resp, r, err := xenditClient.InvoiceApi.CreateInvoice(context.Background()).
-    //     CreateInvoiceRequest(createInvoiceRequest).
-    //     Execute()
-
-	// if err != nil {
-	// 	fmt.Fprintf(os.Stderr, "Error when calling `InvoiceApi.CreateInvoice``: %v\n", err.Error())
-
-	// 	b, _ := json.Marshal(err.Error())
-	// 	fmt.Fprintf(os.Stderr, "Full Error Struct: %v\n", string(b))
-
-	// 	fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-	// }
+	invoice := dto.SendInvoiceResponseLessDetailed{
+		InvoiceId: paymentData.InvoiceID,
+		Amount: paymentData.Amount,
+		InvoiceURL: paymentData.InvoiceURL,
+	}
+	
+	orderResponse := dto.OrderResponse{
+		CatalogLessDetail: orderedCatalog,
+		RentDate: orderData.RentDate,
+		ReturnDate: orderData.ReturnDate,
+		SendInvoiceResponseLessDetailed: invoice,
+	}
 	
 	return c.JSON(http.StatusCreated, dto.Response{
 		Message: "Order created, proceed to payment",
-		Data: xenditResponse,
+		Data: orderResponse,
 	})
 }
