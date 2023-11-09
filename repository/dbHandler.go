@@ -77,21 +77,42 @@ func (db DbHandler) CheckVerification(user entity.User) error {
 	return nil
 }
 
-func (db DbHandler) CreateOrder(data *entity.Order) error {
+func (db DbHandler) CreateOrder(data *entity.Order, duration uint) (float32, error){
+	catalog := entity.Catalog{ID: data.CatalogID}
+	
 	txErr := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.First(&catalog).Error; err != nil {
+			return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+		}
+		
+		if err := tx.Model(&catalog).Update("stock", gorm.Expr("stock - 1")).Error; err != nil {
+			return echo.NewHTTPError(utils.ErrForbidden.Details("Stock is empty"))
+		}
+		
 		if err := tx.Create(data).Error; err != nil {
 			return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 		}
-
-		
-		
 		return nil
 	})
 	if txErr != nil {
-		return txErr
+		return 0, txErr
 	}
-	return nil
+	
+	subtotal := catalog.Cost * float32(duration)
+	return subtotal, nil
 }
+
+// func (db DbHandler) CreatePayment(orderId uint) error {
+// 	payment := entity.Payment{OrderID: orderId}
+	
+// 	txErr := db.Transaction(func(tx *gorm.DB) error {
+// 		return nil
+// 	})
+// 	if txErr != nil {
+// 		return txErr
+// 	}
+// 	return nil
+// }
 
 func (db DbHandler) FindAllCatalogs() ([]dto.Catalog, error) {
 	catalogs := []dto.Catalog{}

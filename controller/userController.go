@@ -130,13 +130,24 @@ func (uc UserController) VerifyEmail(c echo.Context) error {
 		Data: "Your email has been validated",
 	})
 }
+func (uc UserController) History(c echo.Context) error {
+	user, err := helpers.GetClaims(c)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{
+		Message: "Order History",
+		Data: user,
+	})
+}
 
 func (uc UserController) PinpointLocation(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {
 		return err
 	}
-
+	
 	baseUrl := "https://maps.googleapis.com/maps/api/staticmap"
 	req, _ := http.NewRequest(http.MethodGet, baseUrl, nil)
 

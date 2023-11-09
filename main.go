@@ -48,6 +48,7 @@ func main() {
 		users.GET("/verify/:userid/:token", userController.VerifyEmail)
 		users.POST("/login", userController.Login)
 		users.POST("/pinpoint", userController.PinpointLocation, middlewares.RequireAuth)
+		users.POST("/history", userController.History, middlewares.RequireAuth)
 	}
 
 	orders := e.Group("/orders")

@@ -57,12 +57,17 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 		ReturnDate: returnDate,
 	}
 
-	if err := oc.DbHandler.CreateOrder(&orderData); err != nil {
+	subtotal, err := oc.DbHandler.CreateOrder(&orderData, orderDataTmp.Duration)
+	if err != nil {
 		return err
 	}
 	
+	// if err := oc.DbHandler.CreatePayment(orderData.ID); err != nil {
+	// 	return err
+	// }
+	
 	return c.JSON(http.StatusCreated, dto.Response{
 		Message: "Order created, proceed to payment",
-		Data: orderData,
+		Data: subtotal,
 	})
 }
