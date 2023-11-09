@@ -136,9 +136,14 @@ func (uc UserController) History(c echo.Context) error {
 		return err
 	}
 
+	orderHistories, err := uc.DbHandler.FindUserOrderHistory(user.ID)
+	if err != nil {
+		return err
+	}
+	
 	return c.JSON(http.StatusOK, dto.Response{
 		Message: "Order History",
-		Data: user,
+		Data: orderHistories,
 	})
 }
 

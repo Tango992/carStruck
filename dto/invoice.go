@@ -13,15 +13,16 @@ type SendInvoice struct {
 }
 
 type SendInvoiceResponse struct {
-	InvoiceId     string  `json:"id"`
-	ExternalID    string  `json:"external_id"`
-	Status        string  `json:"status"`
-	Amount        float32 `json:"amount"`
-	InvoiceURL    string  `json:"invoice_url"`
+	InvoiceId  string  `json:"id"`
+	ExternalID string  `json:"external_id"`
+	Status     string  `json:"status"`
+	Amount     float32 `json:"amount"`
+	InvoiceURL string  `json:"invoice_url"`
 }
 
 type SendInvoiceResponseLessDetailed struct {
-	InvoiceId     string  `json:"id"`
-	Amount        float32 `json:"amount"`
-	InvoiceURL    string  `json:"invoice_url"`
+	InvoiceId  string  `json:"id"`
+	Amount     float32 `json:"amount"`
+	InvoiceURL string  `json:"invoice_url"`
+	Status     string  `json:"status,omitempty"`
 }

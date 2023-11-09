@@ -68,7 +68,12 @@ func (db DbHandler) ValidateEmail(data *entity.Verification) error {
 
 func (db DbHandler) CheckVerification(user entity.User) error {
 	var validated bool
-	if err := db.Table("verifications v").Select("v.validated").Where("u.id = ?", user.ID).Joins("JOIN users u ON v.user_id = u.id").Take(&validated).Error; err != nil {
+	if err := db.Table("verifications v").
+		Select("v.validated").
+		Where("u.id = ?", user.ID).
+		Joins("JOIN users u ON v.user_id = u.id").
+		Take(&validated).
+	Error; err != nil {
 		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 
@@ -116,7 +121,12 @@ func (db DbHandler) CreatePayment(data *entity.Payment) error {
 func (db DbHandler) FindAllCatalogs() ([]dto.Catalog, error) {
 	catalogs := []dto.Catalog{}
 
-	if err := db.Table("catalogs c").Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Scan(&catalogs).Error; err != nil {
+	if err := db.Table("catalogs c").
+		Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").
+		Joins("JOIN categories cr ON cr.id = c.category_id").
+		Joins("JOIN brands b ON b.id = c.brand_id").
+		Scan(&catalogs).
+	Error; err != nil {
 		return []dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 	return catalogs, nil
@@ -125,7 +135,12 @@ func (db DbHandler) FindAllCatalogs() ([]dto.Catalog, error) {
 func (db DbHandler) FindCatalogByBrand(brand string)  ([]dto.Catalog, error) {
 	catalogs := []dto.Catalog{}
 
-	res := db.Table("catalogs c").Where("b.name = ?", brand).Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Scan(&catalogs)
+	res := db.Table("catalogs c").
+		Where("b.name = ?", brand).
+		Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").
+		Joins("JOIN categories cr ON cr.id = c.category_id").
+		Joins("JOIN brands b ON b.id = c.brand_id").
+		Scan(&catalogs)
 	err := res.Error
 
 	if err != nil {
@@ -142,7 +157,13 @@ func (db DbHandler) FindCatalogByBrand(brand string)  ([]dto.Catalog, error) {
 func (db DbHandler) FindCatalogByModel(model string)  (dto.Catalog, error) {
 	catalog := dto.Catalog{}
 
-	res := db.Table("catalogs c").Where("c.name = ?", model).Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Take(&catalog)
+	res := db.
+		Table("catalogs c").
+		Where("c.name = ?", model).
+		Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").
+		Joins("JOIN categories cr ON cr.id = c.category_id").
+		Joins("JOIN brands b ON b.id = c.brand_id").
+		Take(&catalog)
 	err := res.Error
 
 	if err != nil {
@@ -154,10 +175,16 @@ func (db DbHandler) FindCatalogByModel(model string)  (dto.Catalog, error) {
 	return catalog, nil
 }
 
-func (db DbHandler) FindCatalogByBrandAndModel(brand, model string)  (dto.Catalog, error) {
+func (db DbHandler) FindCatalogByBrandAndModel(brand, model string) (dto.Catalog, error) {
 	catalog := dto.Catalog{}
 
-	res := db.Table("catalogs c").Where("c.name = ?", model).Where("b.name = ?", brand).Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").Joins("JOIN categories cr ON cr.id = c.category_id").Joins("JOIN brands b ON b.id = c.brand_id").Take(&catalog)
+	res := db.Table("catalogs c").
+		Where("c.name = ?", model).
+		Where("b.name = ?", brand).
+		Select("c.id AS catalog_id, b.name AS brand, c.name AS model, cr.name as category, c.stock, c.cost").
+		Joins("JOIN categories cr ON cr.id = c.category_id").
+		Joins("JOIN brands b ON b.id = c.brand_id").
+		Take(&catalog)
 	err := res.Error
 
 	if err != nil {
@@ -167,4 +194,20 @@ func (db DbHandler) FindCatalogByBrandAndModel(brand, model string)  (dto.Catalo
 		return dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 	return catalog, nil
+}
+
+func (db DbHandler) FindUserOrderHistory(userId uint) ([]dto.OrderSummary, error) {
+	orders := []dto.OrderSummary{}
+
+	if err := db.Table("orders o").
+		Where("o.user_id = ?", userId).
+		Select("o.id AS order_id, c.id AS catalog_id, c.name AS model, o.rent_date, o.return_date, p.invoice_id, p.amount, p.invoice_url, p.status").
+		Joins("JOIN catalogs c ON c.id = o.catalog_id").
+		Joins("JOIN payments p ON p.order_id = o.id").
+		Order("order_id DESC").
+		Scan(&orders).
+	Error; err != nil {
+		return []dto.OrderSummary{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	}
+	return orders, nil
 }

@@ -6,9 +6,10 @@ type Order struct {
 	Duration  uint   `json:"duration" validate:"required,min=1" extensions:"x-order=2"`
 }
 
-type OrderResponse struct {
-	CatalogLessDetail               `json:"catalog"`
-	RentDate                        string `json:"rent_date" extensions:"x-order=1"`
-	ReturnDate                      string `json:"return_date" extensions:"x-order=2"`
-	SendInvoiceResponseLessDetailed `json:"invoice"`
+type OrderSummary struct {
+	OrderID                         uint `json:"order_id" extensions:"x-order=0"`
+	CatalogLessDetail               `json:"catalog" extensions:"x-order=1"`
+	RentDate                        string `json:"rent_date" extensions:"x-order=2"`
+	ReturnDate                      string `json:"return_date" extensions:"x-order=3"`
+	SendInvoiceResponseLessDetailed `json:"invoice" extensions:"x-order=4"`
 }
