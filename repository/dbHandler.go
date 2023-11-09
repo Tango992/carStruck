@@ -155,8 +155,8 @@ func (db DbHandler) FindCatalogByBrand(brand string)  ([]dto.Catalog, error) {
 	return catalogs, nil
 }
 
-func (db DbHandler) FindCatalogByModel(model string)  (dto.Catalog, error) {
-	catalog := dto.Catalog{}
+func (db DbHandler) FindCatalogByModel(model string)  ([]dto.Catalog, error) {
+	catalog := []dto.Catalog{}
 
 	res := db.
 		Table("catalogs c").
@@ -169,15 +169,15 @@ func (db DbHandler) FindCatalogByModel(model string)  (dto.Catalog, error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound){
-			return dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Model does not exist in our catalog"))
+			return []dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Model does not exist in our catalog"))
 		}
-		return dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+		return []dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 	return catalog, nil
 }
 
-func (db DbHandler) FindCatalogByBrandAndModel(brand, model string) (dto.Catalog, error) {
-	catalog := dto.Catalog{}
+func (db DbHandler) FindCatalogByBrandAndModel(brand, model string) ([]dto.Catalog, error) {
+	catalog := []dto.Catalog{}
 
 	res := db.Table("catalogs c").
 		Where("c.name = ?", model).
@@ -190,9 +190,9 @@ func (db DbHandler) FindCatalogByBrandAndModel(brand, model string) (dto.Catalog
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound){
-			return dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Model does not exist in our catalog"))
+			return []dto.Catalog{}, echo.NewHTTPError(utils.ErrNotFound.Details("Model does not exist in our catalog"))
 		}
-		return dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+		return []dto.Catalog{}, echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
 	}
 	return catalog, nil
 }

@@ -20,6 +20,17 @@ func NewCatalogController(dbHandler repository.DbHandler) CatalogController {
 	}
 }
 
+// View Catalog  godoc
+// @Summary      Get catalogs
+// @Tags         catalogs
+// @Produce      json
+// @Param        brand  query  string  false  "Search by brand"
+// @Param        model  query  string  false  "Search by model"
+// @Success      200  {object}  dto.CatalogResponse
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      404  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /catalogs [get]
 func (cc CatalogController) ViewCatalogHandler(c echo.Context) error {
 	toTitle := cases.Title(language.AmericanEnglish)
 	brand := toTitle.String(c.QueryParam("brand"))

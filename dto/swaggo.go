@@ -21,3 +21,13 @@ type HistoryResponse struct {
 	Message string         `json:"message" extensions:"x-order=0"`
 	Data    []OrderSummary `json:"data" extensions:"x-order=1"`
 }
+
+type CatalogResponse struct {
+	Message string    `json:"message" extensions:"x-order=0"`
+	Data    []Catalog `json:"data" extensions:"x-order=1"`
+}
+
+type OrderResponse struct {
+	Message      string `json:"message" extensions:"x-order=0"`
+	OrderSummary `json:"data" extensions:"x-order=1"`
+}

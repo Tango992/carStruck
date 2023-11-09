@@ -1,11 +1,37 @@
 basePath: /
 definitions:
+  dto.Catalog:
+    properties:
+      brand:
+        type: string
+      catalog_id:
+        type: integer
+      category:
+        type: string
+      cost:
+        type: number
+      model:
+        type: string
+      stock:
+        type: integer
+    type: object
   dto.CatalogLessDetail:
     properties:
       catalog_id:
         type: integer
       model:
         type: string
+    type: object
+  dto.CatalogResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.Catalog'
+        type: array
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
     type: object
   dto.GeneralResponse:
     properties:
@@ -38,6 +64,16 @@ definitions:
     required:
     - email
     - password
+    type: object
+  dto.OrderResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/dto.OrderSummary'
+        x-order: "1"
+      message:
+        type: string
+        x-order: "0"
     type: object
   dto.OrderSummary:
     properties:
@@ -124,6 +160,19 @@ definitions:
       status:
         type: string
     type: object
+  dto.XenditWebhook:
+    properties:
+      completed_at:
+        type: string
+      external_id:
+        type: string
+      id:
+        type: string
+      payment_method:
+        type: string
+      status:
+        type: string
+    type: object
   utils.ErrResponse:
     properties:
       detail:
@@ -149,10 +198,101 @@ info:
   title: carStruck API
   version: "1.0"
 paths:
-  /users/history:
+  /catalogs:
     get:
+      parameters:
+      - description: Search by brand
+        in: query
+        name: brand
+        type: string
+      - description: Search by model
+        in: query
+        name: model
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CatalogResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Get catalogs
+      tags:
+      - catalogs
+  /orders:
+    post:
       consumes:
       - application/json
+      description: You need an 'Authorization' cookie attached within this request.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Submit new car rental order
+      tags:
+      - orders
+  /orders/update:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Attached data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.XenditWebhook'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+      summary: Update payment info from Xendit's server if payment is success.
+      tags:
+      - orders
+  /users/history:
+    get:
       description: You need an 'Authorization' cookie attached within this request.
       produces:
       - application/json
@@ -163,6 +303,10 @@ paths:
             $ref: '#/definitions/dto.HistoryResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/utils.ErrResponse'
         "500":
@@ -211,14 +355,16 @@ paths:
       - users
   /users/pinpoint:
     get:
-      consumes:
-      - application/json
       description: You need an 'Authorization' cookie attached within this request.
       produces:
       - image/png
       responses:
         "200":
           description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -261,8 +407,6 @@ paths:
       - users
   /users/verify/{userid}/{token}:
     get:
-      consumes:
-      - application/json
       parameters:
       - description: User Id
         in: path

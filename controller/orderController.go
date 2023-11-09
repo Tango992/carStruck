@@ -27,6 +27,19 @@ func NewOrderController(dbHandler repository.DbHandler) OrderController {
 	}
 }
 
+// Orders  godoc
+// @Summary      Submit new car rental order
+// @Description  You need an 'Authorization' cookie attached within this request.
+// @Tags         orders
+// @Accept       json
+// @Produce      json
+// @Success      201  {object}  dto.OrderResponse
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
+// @Failure      403  {object}  utils.ErrResponse
+// @Failure      404  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /orders [post]
 func (oc OrderController) NewOrder(c echo.Context) error {
 	user, err := helpers.GetClaims(c)
 	if err != nil {
@@ -115,6 +128,15 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 	})
 }
 
+// Orders  godoc
+// @Summary      Update payment info from Xendit's server if payment is success.
+// @Tags         orders
+// @Accept       json
+// @Param        request body dto.XenditWebhook  true  "Attached data"
+// @Success      200
+// @Failure      400  {object}  utils.ErrResponse
+// @Failure      500  {object}  utils.ErrResponse
+// @Router       /orders/update [post]
 func (oc OrderController) FetchPaymentUpdate(c echo.Context) error {
 	var paymentData dto.XenditWebhook
 	if err := c.Bind(&paymentData); err != nil {

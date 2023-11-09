@@ -134,7 +134,6 @@ func (uc UserController) Login(c echo.Context) error {
 // Verification  godoc
 // @Summary      Verify newly registered email
 // @Tags         users
-// @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "User Id"
 // @Param        token   path      int  true  "Secret Token"
@@ -169,10 +168,10 @@ func (uc UserController) VerifyEmail(c echo.Context) error {
 // @Summary      Get user's order history
 // @Description  You need an 'Authorization' cookie attached within this request.
 // @Tags         users
-// @Accept       json
 // @Produce      json
 // @Success      200  {object}  dto.HistoryResponse
 // @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
 // @Failure      500  {object}  utils.ErrResponse
 // @Router       /users/history [get]
 func (uc UserController) History(c echo.Context) error {
@@ -196,9 +195,9 @@ func (uc UserController) History(c echo.Context) error {
 // @Summary      Get user's map location
 // @Description  You need an 'Authorization' cookie attached within this request.
 // @Tags         users
-// @Accept       json
 // @Produce      image/png
-// @Success      200  
+// @Success      200
+// @Failure      401  {object}  utils.ErrResponse
 // @Failure      500  {object}  utils.ErrResponse
 // @Router       /users/pinpoint [get]
 func (uc UserController) PinpointLocation(c echo.Context) error {
