@@ -17,7 +17,6 @@ func SignNewJWT(c echo.Context, user entity.User) error {
 		"exp": time.Now().Add(2 * time.Hour).Unix(),
 		"id": user.ID,
 		"email": user.Email,
-		"deposit": user.Deposit,
 		"full_name": user.FullName,
 		"address": user.Address,
 	}

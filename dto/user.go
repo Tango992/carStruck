@@ -6,7 +6,6 @@ type Register struct {
 	Password string  `json:"password,omitempty" validate:"required" extensions:"x-order=2"`
 	Address  string  `json:"address" validate:"required" extensions:"x-order=3"`
 	Birth    string  `json:"birth" validate:"required" extensions:"x-order=4"`
-	Deposit  float32 `json:"deposit" validate:"min=100,required" extensions:"x-order=5"`
 }
 
 type Login struct {

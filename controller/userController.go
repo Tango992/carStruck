@@ -48,7 +48,6 @@ func (uc UserController) Register(c echo.Context) error {
 		Email: registerDataTmp.Email,
 		Password: registerDataTmp.Password,
 		Birth: registerDataTmp.Birth,
-		Deposit: registerDataTmp.Deposit,
 		Address: registerDataTmp.Address,
 	}
 	
