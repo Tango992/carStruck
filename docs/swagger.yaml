@@ -136,7 +136,7 @@ definitions:
         type: string
         x-order: "1"
     type: object
-host: https://carstruck-4d6b89ee5e4e.herokuapp.com
+host: carstruck-4d6b89ee5e4e.herokuapp.com
 info:
   contact:
     email: daniel.rahmanto@gmail.com

@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "https://carstruck-4d6b89ee5e4e.herokuapp.com",
+    "host": "carstruck-4d6b89ee5e4e.herokuapp.com",
     "basePath": "/",
     "paths": {
         "/users/history": {
