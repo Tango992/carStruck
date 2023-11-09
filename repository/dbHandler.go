@@ -78,8 +78,19 @@ func (db DbHandler) CheckVerification(user entity.User) error {
 }
 
 func (db DbHandler) CreateOrder(data *entity.Order) error {
-	if err := db.Create(data).Error; err != nil {
-		return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+	
+	
+	txErr := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(data).Error; err != nil {
+			return echo.NewHTTPError(utils.ErrInternalServer.Details(err.Error()))
+		}
+
+		
+		
+		return nil
+	})
+	if txErr != nil {
+		return txErr
 	}
 	return nil
 }

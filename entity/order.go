@@ -7,4 +7,5 @@ type Order struct {
 	RentDate   string `gorm:"type:date;not null"`
 	ReturnDate string `gorm:"type:date;not null"`
 	Finished   bool   `gorm:"default:false"`
+	Payment    Payment
 }
