@@ -1,0 +1,21 @@
+package dto
+
+type CustomerDetail struct {
+	GivenNames string `json:"given_names"`
+	Email      string `json:"email"`
+}
+
+type SendInvoice struct {
+	ExternalID     string  `json:"external_id"`
+	Amount         float32 `json:"amount"`
+	Description    string  `json:"description"`
+	CustomerDetail `json:"customer"`
+}
+
+type SendInvoiceResponse struct {
+	InvoiceId  string  `json:"id"`
+	ExternalID string  `json:"external_id"`
+	Status     string  `json:"status"`
+	Amount     float32 `json:"amount"`
+	InvoiceURL string  `json:"invoice_url"`
+}

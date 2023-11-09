@@ -97,7 +97,7 @@ func (db DbHandler) CreateOrder(data *entity.Order, duration uint) (float32, err
 	if txErr != nil {
 		return 0, txErr
 	}
-	
+
 	subtotal := catalog.Cost * float32(duration)
 	return subtotal, nil
 }
