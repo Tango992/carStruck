@@ -19,7 +19,7 @@
 * Go
 * Echo
 * PostgreSQL
-* JWT-Authorization
+* JWT-Authorization (Cookie Authorization)
 * 3rd Party APIs (Xendit, Google Maps Static)
 * SMTP
 * REST
