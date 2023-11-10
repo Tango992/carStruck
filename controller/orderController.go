@@ -135,9 +135,15 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 // @Param        request body dto.XenditWebhook  true  "Attached data"
 // @Success      200
 // @Failure      400  {object}  utils.ErrResponse
+// @Failure      401  {object}  utils.ErrResponse
 // @Failure      500  {object}  utils.ErrResponse
 // @Router       /orders/update [post]
 func (oc OrderController) FetchPaymentUpdate(c echo.Context) error {
+	webhookToken := c.Request().Header.Get("x-callback-token")
+	if webhookToken != os.Getenv("XENDIT_WEBHOOK_TOKEN") {
+		return echo.NewHTTPError(utils.ErrUnauthorized.Details("Invalid webhook token"))
+	}
+	
 	var paymentData dto.XenditWebhook
 	if err := c.Bind(&paymentData); err != nil {
 		return echo.NewHTTPError(utils.ErrBadRequest.Details(err.Error()))
