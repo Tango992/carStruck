@@ -3,18 +3,19 @@ package main
 import (
 	"carstruck/config"
 	"carstruck/controller"
+	_ "carstruck/docs"
 	"carstruck/helpers"
 	"carstruck/middlewares"
 	"carstruck/repository"
-	_ "carstruck/docs"
+	"net/http"
 	"os"
 
-	"github.com/swaggo/echo-swagger"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
+	"github.com/swaggo/echo-swagger"
 )
 
 // @title carStruck API
@@ -56,6 +57,8 @@ func main() {
 	}))	
 	e.Use(middleware.Recover())
 
+	e.GET("/", func(c echo.Context) error {return c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")})
+	
 	users := e.Group("/users")
 	{
 		users.POST("/register", userController.Register)
