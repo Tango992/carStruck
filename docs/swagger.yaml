@@ -191,7 +191,8 @@ info:
     email: daniel.rahmanto@gmail.com
     name: Daniel Rahmanto
   description: A car rental API utilizing payment gateway (Xendit) and Google Maps
-    API. Made as a project for Hacktiv8
+    Static API. Made as a project for Hacktiv8, derived from myself to give a digitalized
+    business solution.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -271,6 +272,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: Secret token from Xendit to validate the request
+        in: header
+        name: x-callback-token
+        required: true
+        type: string
       - description: Attached data
         in: body
         name: request
@@ -284,11 +290,15 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.ErrResponse'
-      summary: Update payment info from Xendit's server if payment is success.
+      summary: Update payment info from Xendit's server if payment is successful.
       tags:
       - orders
   /users/history:

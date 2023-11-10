@@ -129,9 +129,10 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 }
 
 // Orders  godoc
-// @Summary      Update payment info from Xendit's server if payment is success.
+// @Summary      Update payment info from Xendit's server if payment is successful.
 // @Tags         orders
 // @Accept       json
+// @Param        x-callback-token header string true "Secret token from Xendit to validate the request"
 // @Param        request body dto.XenditWebhook  true  "Attached data"
 // @Success      200
 // @Failure      400  {object}  utils.ErrResponse

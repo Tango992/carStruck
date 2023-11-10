@@ -134,8 +134,15 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Update payment info from Xendit's server if payment is success.",
+                "summary": "Update payment info from Xendit's server if payment is successful.",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret token from Xendit to validate the request",
+                        "name": "x-callback-token",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Attached data",
                         "name": "request",
@@ -152,6 +159,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrResponse"
                         }
@@ -675,7 +688,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "carStruck API",
-	Description:      "A car rental API utilizing payment gateway (Xendit) and Google Maps API. Made as a project for Hacktiv8",
+	Description:      "A car rental API utilizing payment gateway (Xendit) and Google Maps Static API. Made as a project for Hacktiv8, derived from myself to give a digitalized business solution.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
