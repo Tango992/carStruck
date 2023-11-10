@@ -21,7 +21,13 @@ INSERT INTO catalogs (brand_id, category_id, name, stock, cost)
 VALUES (1, 1, 'Avanza', 100, 500000);
 
 INSERT INTO users (full_name, email, password, birth, address)
-VALUES ('John Doe', 'john@mail.com', '$2a$10$.F.xwVpESnzJo4gFvzhVM.7WBd7szXRn/BvlRoHISLyshSh32WEUu', '2001-01-01', 'Perkantoran The Breeze BSD')
+VALUES ('John Doe', 'john@mail.com', '$2a$10$.F.xwVpESnzJo4gFvzhVM.7WBd7szXRn/BvlRoHISLyshSh32WEUu', '2001-01-01', 'Perkantoran The Breeze BSD');
 
 INSERT INTO verifications (user_id, token)
-VALUES (1, 'abcd')
+VALUES (1, 'abcd');
+
+INSERT INTO orders (user_id, catalog_id, rent_date, return_date)
+VALUES (1, 1, '2023-11-10', '2023-11-20');
+
+INSERT INTO payments (order_id, invoice_id, amount, invoice_url, status, created_at)
+VALUES (1, 'abcd', 5000000, 'https://google.com', 'PENDING', '2023-11-01 00:00:00');

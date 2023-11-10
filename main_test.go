@@ -38,6 +38,7 @@ var (
 	loginResponse       = `{"message":"Logged in","data":"Welcome, John Doe!"}` + "\n"
 	verifyEmailResponse = `{"message":"Validated","data":"Your email has been validated"}` + "\n"
 	catalogsResponse    = `{"message":"View catalog","data":[{"catalog_id":1,"brand":"Toyota","model":"Avanza","category":"MPV","stock":100,"cost":500000}]}` + "\n"
+	updatePayment       = `{"id":"ABCD","external_id":"1","payment_method":"BANK_TRANSFER","status":"PAID"}`
 )
 
 func TestMain(m *testing.M) {
@@ -73,27 +74,6 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func TestLogin(t *testing.T) {
-	req := httptest.NewRequest(http.MethodPost, "localhost:8080/users/login", strings.NewReader(validCredential))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
-	if assert.NoError(t, userControllerTest.Login(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Equal(t, loginResponse, rec.Body.String())
-	}
-
-	req2 := httptest.NewRequest(http.MethodPost, "localhost:8080/users/login", strings.NewReader(invalidCredential))
-	req2.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	c2 := e.NewContext(req2, rec)
-
-	if assert.Error(t, userControllerTest.Login(c2)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Equal(t, loginResponse, rec.Body.String())
-	}
-}
-
 func TestEmailVerification(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "localhost:8080/users/verify/:userid/:token", nil)
 	rec := httptest.NewRecorder()
@@ -115,6 +95,28 @@ func TestEmailVerification(t *testing.T) {
 	}
 }
 
+func TestLogin(t *testing.T) {
+	req := httptest.NewRequest(http.MethodPost, "localhost:8080/users/login", strings.NewReader(validCredential))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(t, userControllerTest.Login(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, loginResponse, rec.Body.String())
+	}
+
+	req2 := httptest.NewRequest(http.MethodPost, "localhost:8080/users/login", strings.NewReader(invalidCredential))
+	req2.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	c2 := e.NewContext(req2, rec)
+
+	if assert.Error(t, userControllerTest.Login(c2)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, loginResponse, rec.Body.String())
+	}
+}
+
+
 func TestGetCatalog(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "localhost:8080/catalogs", nil)
 	rec := httptest.NewRecorder()
@@ -123,5 +125,16 @@ func TestGetCatalog(t *testing.T) {
 	if assert.NoError(t, catalogControllerTest.ViewCatalogHandler(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, catalogsResponse, rec.Body.String())
+	}
+}
+
+func TestXenditWebhook(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "localhost:8080/orders/update", strings.NewReader(updatePayment))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(t, orderControllerTest.FetchPaymentUpdate(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
