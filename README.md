@@ -30,6 +30,6 @@
 
 ![ERD](./misc/ERD.svg)
 
-### Room of Improvement:
+### Room for Improvements:
 
 Since this is only a prototype, there are so many room for improvements. Feel free to fork and make a pull request if you feel like improving it!

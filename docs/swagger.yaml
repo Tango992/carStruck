@@ -420,7 +420,7 @@ paths:
       parameters:
       - description: User Id
         in: path
-        name: id
+        name: userid
         required: true
         type: integer
       - description: Secret Token

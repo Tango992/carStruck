@@ -366,7 +366,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "User Id",
-                        "name": "id",
+                        "name": "userid",
                         "in": "path",
                         "required": true
                     },

@@ -135,7 +135,7 @@ func (uc UserController) Login(c echo.Context) error {
 // @Summary      Verify newly registered email
 // @Tags         users
 // @Produce      json
-// @Param        id   path      int  true  "User Id"
+// @Param        userid   path      int  true  "User Id"
 // @Param        token   path      int  true  "Secret Token"
 // @Success      200  {object}  dto.GeneralResponse
 // @Failure      400  {object}  utils.ErrResponse

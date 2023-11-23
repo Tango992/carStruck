@@ -4,6 +4,7 @@ import (
 	"carstruck/entity"
 	"log"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -19,7 +20,18 @@ func InitDb() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+	
 	AutoMigrate(db)
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sqlDB.SetMaxIdleConns(100)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+	
 	return db
 }
 
