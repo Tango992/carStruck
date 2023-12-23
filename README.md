@@ -1,6 +1,6 @@
 # carStruck
 
-[Feel free to try this API. Click to access the documentation.](https://carstruck.fly.dev)
+[Feel free to try this API. Click to access the documentation.](https://car-struck.fly.dev)
 
 ## Description:
 

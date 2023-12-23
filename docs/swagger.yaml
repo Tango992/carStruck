@@ -185,7 +185,7 @@ definitions:
         type: string
         x-order: "1"
     type: object
-host: carstruck-4d6b89ee5e4e.herokuapp.com
+host: car-struck.fly.dev
 info:
   contact:
     email: daniel.rahmanto@gmail.com

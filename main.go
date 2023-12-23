@@ -28,7 +28,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host carstruck-4d6b89ee5e4e.herokuapp.com
+// @host car-struck.fly.dev
 // @BasePath /
 func main() {
 	db := config.InitDb()

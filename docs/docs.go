@@ -684,7 +684,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "carstruck-4d6b89ee5e4e.herokuapp.com",
+	Host:             "car-struck.fly.dev",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "carStruck API",
