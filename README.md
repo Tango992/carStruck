@@ -1,6 +1,6 @@
 # carStruck
 
-[Feel free to try this API. Click to access the documentation.](https://carstruck-4d6b89ee5e4e.herokuapp.com/swagger/index.html)
+[Feel free to try this API. Click to access the documentation.](https://carstruck.fly.dev)
 
 ## Description:
 
@@ -10,6 +10,7 @@
 
 ## Highlights:
 
+* Docker Deployment with Fly.io
 * Google Maps (useful to pinpoint car delivery location)
 * Payment Gateway (Xendit with webhook callback)
 * Email verification for newly registered user
