@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -51,14 +52,33 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 		return echo.NewHTTPError(utils.ErrBadRequest.Details(err.Error()))
 	}
 
-	if err := c.Validate(&orderDataTmp); err != nil {
-		return err
-	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	errChan := make(chan error, 2)
 
-	if err := helpers.DateValidator(orderDataTmp.RentDate); err != nil {
-		return err
-	}
+	go func (orderDataTmp *dto.Order)  {
+		defer wg.Done()
+		if err := c.Validate(&orderDataTmp); err != nil {
+			errChan <-err
+		}
+	}(&orderDataTmp)
 
+	go func (rentDate string)  {
+		defer wg.Done()
+		if err := helpers.DateValidator(rentDate); err != nil {
+			errChan <-err
+		}
+	}(orderDataTmp.RentDate)
+	
+	wg.Wait()
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
+			return err
+		}
+	}
+	
 	dateFormat := "2006-01-02"
 	rentDateFormatted, _ := time.Parse(dateFormat, orderDataTmp.RentDate)
 	currentDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).Unix()
