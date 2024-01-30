@@ -9,6 +9,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func InitDb() *gorm.DB {

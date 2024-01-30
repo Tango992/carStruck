@@ -16,8 +16,9 @@ func SendVerificationEmail(user entity.User, verification entity.Verification) e
 	authPass := os.Getenv("AUTH_PASS")
 	smptHost := os.Getenv("SMPT_HOST")
 	smptPort := os.Getenv("SMPT_PORT")
+	baseUrl := os.Getenv("BASE_URL")
 	
-	url := fmt.Sprintf("https://carstruck-4d6b89ee5e4e.herokuapp.com/users/verify/%v/%v", user.ID, verification.Token)
+	url := fmt.Sprintf("https://%v/users/verify/%v/%v", baseUrl, user.ID, verification.Token)
 	subject := "Subject: Carstruck Account Verification\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 
