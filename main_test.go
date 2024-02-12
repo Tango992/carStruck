@@ -24,7 +24,6 @@ import (
 
 var (
 	e                     *echo.Echo
-	db                    *gorm.DB
 	dbHandlerTest         repository.DbHandler
 	userControllerTest    controller.UserController
 	orderControllerTest   controller.OrderController
