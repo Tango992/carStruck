@@ -54,7 +54,8 @@ func main() {
 
 			return nil
 		},
-	}))	
+	}))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(10)))
 	e.Use(middleware.Recover())
 
 	e.GET("/", func(c echo.Context) error {return c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")})
