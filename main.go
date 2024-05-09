@@ -19,7 +19,7 @@ import (
 )
 
 // @title carStruck API
-// @version 1.0
+// @version 1.0.1
 // @description A car rental API utilizing payment gateway (Xendit) and Google Maps Static API. Made as a project for Hacktiv8, derived from myself to give a digitalized business solution.
 
 // @contact.name Daniel Rahmanto
