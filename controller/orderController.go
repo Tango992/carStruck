@@ -56,20 +56,20 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 	wg.Add(2)
 	errChan := make(chan error, 2)
 
-	go func (orderDataTmp *dto.Order)  {
+	go func() {
 		defer wg.Done()
 		if err := c.Validate(&orderDataTmp); err != nil {
-			errChan <-err
+			errChan <- err
 		}
-	}(&orderDataTmp)
+	}()
 
-	go func (rentDate string)  {
+	go func() {
 		defer wg.Done()
-		if err := helpers.DateValidator(rentDate); err != nil {
-			errChan <-err
+		if err := helpers.DateValidator(orderDataTmp.RentDate); err != nil {
+			errChan <- err
 		}
-	}(orderDataTmp.RentDate)
-	
+	}()
+
 	wg.Wait()
 	close(errChan)
 
@@ -78,7 +78,7 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 			return err
 		}
 	}
-	
+
 	dateFormat := "2006-01-02"
 	rentDateFormatted, _ := time.Parse(dateFormat, orderDataTmp.RentDate)
 	currentDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).Unix()
@@ -131,7 +131,7 @@ func (oc OrderController) NewOrder(c echo.Context) error {
 		InvoiceId:  paymentData.InvoiceID,
 		Amount:     paymentData.Amount,
 		InvoiceURL: paymentData.InvoiceURL,
-		Status: paymentData.Status,
+		Status:     paymentData.Status,
 	}
 
 	orderResponse := dto.OrderSummary{
@@ -164,7 +164,7 @@ func (oc OrderController) FetchPaymentUpdate(c echo.Context) error {
 	if webhookToken != os.Getenv("XENDIT_WEBHOOK_TOKEN") {
 		return echo.NewHTTPError(utils.ErrUnauthorized.Details("Invalid webhook token"))
 	}
-	
+
 	var paymentData dto.XenditWebhook
 	if err := c.Bind(&paymentData); err != nil {
 		return echo.NewHTTPError(utils.ErrBadRequest.Details(err.Error()))

@@ -3,7 +3,6 @@ package helpers
 import (
 	"carstruck/dto"
 	"carstruck/utils"
-	"fmt"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -15,8 +14,6 @@ func GetClaims(c echo.Context) (dto.Claims, error) {
 	if claimsTmp == nil {
 		return dto.Claims{}, echo.NewHTTPError(utils.ErrUnauthorized.Details("Failed to fetch user claims from JWT"))
 	}
-
-	fmt.Println(claimsTmp)
 	
 	claims := claimsTmp.(jwt.MapClaims)
 	return dto.Claims{
